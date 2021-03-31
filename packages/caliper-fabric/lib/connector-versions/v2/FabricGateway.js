@@ -89,7 +89,7 @@ class V2FabricGateway extends ConnectorBase {
 
         // Timeouts
         this.configSmallestTimeout = 1000;
-        this.configDefaultTimeout = ConfigUtil.get(ConfigUtil.keys.Fabric.Timeout.InvokeOrQuery, 60000);
+        this.configDefaultTimeout = 300000//ConfigUtil.get(ConfigUtil.keys.Fabric.Timeout.InvokeOrQuery, 60000);
         this.configCountQueryAsLoad = ConfigUtil.get(ConfigUtil.keys.Fabric.CountQueryAsLoad, true);
 
         // Gateway connector
@@ -128,8 +128,35 @@ class V2FabricGateway extends ConnectorBase {
         // Seems to be only for operational initialisation but need to implement as the master
         // will call it
         const defaultOrganization = this.connectorConfiguration.getOrganizations()[0];
+        logger.info(`Log b2c2 isTLSEnabled :)`);
+        //logger.info("defaultOrganization");
+        //logger.info(defaultOrganization);
+        //logger.info("this.connectorConfiguration.isMutualTLS()");
+        //logger.info(this.connectorConfiguration.isMutualTLS());
+        //logger.info("this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization)");
+        //logger.info(this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization));
+        //logger.info(Object(this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization)));
+        this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization).then(x => {console.log(x)});
+
+        try {
+            console.log("dynamic connectionprofile " + this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization).isDynamicConnectionProfile());
+        } catch (error) {
+            console.error(error);
+        }
+
+        var cp = await this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization);
+        console.log(cp);
+        try {
+            console.log("tls enabled" + cp.isTLSEnabled());
+        } catch (error) {
+            console.error(error);
+        }
+
         const tlsInfo = this.connectorConfiguration.isMutualTLS() ? 'mutual'
-            : (this.connectorConfiguration.getConnectionProfileDefinitionForOrganization(defaultOrganization).isTLSEnabled() ? 'server' : 'none');
+            : cp.isTLSEnabled() ? 'server' : 'none';
+
+        logger.info("tlsInfo")
+        logger.info(tlsInfo)
         logger.info(`Fabric SDK version: ${this.fabricNetworkVersion.toString()}; TLS based on ${defaultOrganization}: ${tlsInfo}`);
     }
 
@@ -285,6 +312,12 @@ class V2FabricGateway extends ConnectorBase {
 
         try {
             logger.info(`Connecting user with identity ${aliasName} to a Network Gateway`);
+            logger.info(`Log b2c2 :)`);
+            logger.info(connectionProfileDefinition.getConnectionProfile());
+            logger.info(opts)
+            logger.info(Object(opts)["wallet"])
+            logger.info(Object(opts)["eventHandlerOptions"])
+            logger.info(Object(opts)["queryHandlerOptions"])
             await gateway.connect(connectionProfileDefinition.getConnectionProfile(), opts);
             logger.info(`Successfully connected user with identity ${aliasName} to a Network Gateway`);
         } catch (err) {

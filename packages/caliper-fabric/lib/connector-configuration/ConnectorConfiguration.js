@@ -171,7 +171,8 @@ class ConnectorConfiguration {
             if (!connectionProfileEntry.loadedConnectionProfile) {
                 connectionProfileEntry.loadedConnectionProfile = await this._loadConnectionProfile(connectionProfileEntry.path);
             }
-
+            //console.log(connectionProfileEntry.loadedConnectionProfile);
+            //console.log(new ConnectionProfileDefinition(mspId, connectionProfileEntry));
             return new ConnectionProfileDefinition(mspId, connectionProfileEntry);
         }
 
