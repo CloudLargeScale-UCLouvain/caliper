@@ -13,7 +13,7 @@
 */
 
 'use strict';
-
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const CaliperUtils = require('../common/utils/caliper-utils.js');
 const RateControl = require('./rate-control/rateControl.js');
 
@@ -173,6 +173,7 @@ class CaliperWorker {
      * @return {Promise<TransactionStatisticsCollector>} The results of the round execution.
      */
     async executeRound(testMessage) {
+	this.txObserverDispatch.resultArray = []
         Logger.debug('Entering executeRound');
 
         const workerArguments = testMessage.getWorkerArguments();
@@ -217,6 +218,23 @@ class CaliperWorker {
             await this.connector.releaseContext(context);
 
             Logger.debug(`Worker #${this.workerIndex} finished round #${roundIndex}`, this.internalTxObserver.getCurrentStatistics().getCumulativeTxStatistics());
+            
+            const csvWriter = createCsvWriter({
+                path: `${roundIndex} ${roundLabel} resultsFile.csv`,
+                header: [
+                    {id: 'time_create', title: 'time_create'}
+                ]
+            });
+
+
+            console.log("this.txObserverDispatch.resultArray");
+	    console.log(this.txObserverDispatch.resultArray);
+            csvWriter.writeRecords(this.txObserverDispatch.resultArray)       // returns a promise
+            .then(() => {
+                console.log('this.txObserverDispatch.resultArray written to fild.csv');
+            });
+
+
             return this.internalTxObserver.getCurrentStatistics();
         } catch (err) {
             Logger.error(`Unexpected error in worker #${this.workerIndex}: ${(err.stack || err)}`);

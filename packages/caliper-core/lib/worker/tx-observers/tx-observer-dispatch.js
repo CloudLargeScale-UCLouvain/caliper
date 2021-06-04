@@ -51,6 +51,7 @@ class TxObserverDispatch extends TxObserverInterface {
 
         // always load the internal TX observer
         this.txObservers.push(internalTxObserver);
+	this.resultsArray = [];
     }
 
     /**
@@ -105,6 +106,17 @@ class TxObserverDispatch extends TxObserverInterface {
         for (let observer of this.txObservers) {
             observer.txFinished(results);
         }
+	if (Array.isArray(results)) {
+            for (let result of results) {
+		console.log(`*** Inside tx observer dispatch txFinished - results is array`);
+                console.log(result);
+		this.resultsArray.push(result);
+	    }
+        } else {
+		console.log(`*** Inside tx observer dispatch txFinished - results is NOT array`);
+                console.log(results);
+		this.resultsArray.push(results);
+	}
     }
 }
 

@@ -13,7 +13,8 @@
 */
 
 'use strict';
-
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+var resultsArray = [];
 /**
  * Encapsulates TX statistics for a given worker node for a given round.
  *
@@ -73,6 +74,7 @@ class TransactionStatisticsCollector {
      * @private
      */
     _updateStatistics(txResult) {
+        resultsArray.push(txResult)
         this.stats.txCounters.totalFinished +=1;
 
         // updating create time stats
@@ -112,6 +114,10 @@ class TransactionStatisticsCollector {
                 Math.max(latency, this.stats.latency.failed.max);
             this.stats.latency.failed.total += latency;
         }
+        console.log(`Our log txResult`);
+        console.log(txResult);
+
+        
     }
 
     ////////////
@@ -298,6 +304,10 @@ class TransactionStatisticsCollector {
         // snapshot of current results
         let currentStats = collectors.map(c => c.getCumulativeTxStatistics());
 
+
+
+
+
         // NOTE: we have a 2D grid of stats, the axis are: "worker" and "round"
         // 1) If the stats are all from the same round, and from different workers, then we get a round-level summary
         // 2) If the stats are all from the same worker, and from different rounds, then we get a worker-level summary
@@ -316,7 +326,7 @@ class TransactionStatisticsCollector {
         const sumStats = (selector) => currentStats.map(stat => selector(stat)).reduce(sum, 0);
         const minStat = (selector) => Math.min(...currentStats.map(stat => selector(stat)));
         const maxStat = (selector) => Math.max(...currentStats.map(stat => selector(stat)));
-
+        
         let mergedStats = {
             metadata: {
                 workerIndex: workerIndex,
@@ -394,6 +404,8 @@ class TransactionStatisticsCollector {
      * @param {TxStatus | TxStatus[]} results The result information of the finished TXs. Can be a collection of results for a batch of TXs.
      */
     txFinished(results) {
+        console.log(`Our log results`);
+        console.log(results);
         if (!this.active) {
             return;
         }
@@ -402,6 +414,8 @@ class TransactionStatisticsCollector {
             let relevantResults = results.filter(r => r.GetTimeCreate() > this.getRoundStartTime());
             for (let result of relevantResults) {
                 this._updateStatistics(result);
+                console.log(`Our log result`);
+                console.log(result);
             }
             for (let subcollector of this.subCollectors) {
                 subcollector.txFinished(relevantResults);
