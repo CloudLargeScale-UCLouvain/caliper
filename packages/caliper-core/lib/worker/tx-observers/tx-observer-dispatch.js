@@ -51,7 +51,7 @@ class TxObserverDispatch extends TxObserverInterface {
 
         // always load the internal TX observer
         this.txObservers.push(internalTxObserver);
-	this.resultsArray = [];
+	    this.resultsArray = [];
     }
 
     /**
@@ -108,15 +108,23 @@ class TxObserverDispatch extends TxObserverInterface {
         }
 	if (Array.isArray(results)) {
             for (let result of results) {
-		console.log(`*** Inside tx observer dispatch txFinished - results is array`);
-                console.log(result);
-		this.resultsArray.push(result);
+		        //console.log(`*** Inside tx observer dispatch txFinished - results is array`);
+                //console.log(result);
+                //console.log(`*** end of array****************************************`);
+		        this.resultsArray.push(result);
 	    }
+        //console.log(`********************** start of this.resultsArray`);
+        //console.log(this.resultsArray);
+        //console.log(`********************** end of this.resultsArray`);
         } else {
-		console.log(`*** Inside tx observer dispatch txFinished - results is NOT array`);
-                console.log(results);
-		this.resultsArray.push(results);
-	}
+		    //console.log(`*** Inside tx observer dispatch txFinished - results is NOT array`);
+            //console.log(results);
+            //console.log(`*** end of NOT array****************************************`);
+		    this.resultsArray.push(results);
+	    }
+        //console.log(`********************** start of this.resultsArray`);
+        //console.log(this.resultsArray);
+        //console.log(`********************** end of this.resultsArray`);
     }
 }
 

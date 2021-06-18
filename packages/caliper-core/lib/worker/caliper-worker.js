@@ -173,7 +173,7 @@ class CaliperWorker {
      * @return {Promise<TransactionStatisticsCollector>} The results of the round execution.
      */
     async executeRound(testMessage) {
-	this.txObserverDispatch.resultArray = []
+	this.txObserverDispatch.resultsArray = []
         Logger.debug('Entering executeRound');
 
         const workerArguments = testMessage.getWorkerArguments();
@@ -220,18 +220,22 @@ class CaliperWorker {
             Logger.debug(`Worker #${this.workerIndex} finished round #${roundIndex}`, this.internalTxObserver.getCurrentStatistics().getCumulativeTxStatistics());
             
             const csvWriter = createCsvWriter({
-                path: `${roundIndex} ${roundLabel} resultsFile.csv`,
+                path: `/results/worker${this.workerIndex}_round${roundIndex}_${roundLabel}_resultsFile.csv`,
                 header: [
-                    {id: 'time_create', title: 'time_create'}
-                ]
+                    {id: 'status.time_create', title: 'time_create'},
+                    {id: 'status.time_final', title: 'time_final'},
+                    {id: 'status.id', title: 'id'},
+                    {id: 'status.status', title: 'status'}
+                ],
+                headerIdDelimiter: '.'
             });
 
 
-            console.log("this.txObserverDispatch.resultArray");
-	    console.log(this.txObserverDispatch.resultArray);
-            csvWriter.writeRecords(this.txObserverDispatch.resultArray)       // returns a promise
+            //console.log("this.txObserverDispatch.resultsArray");
+	    console.log(this.txObserverDispatch.resultsArray);
+            csvWriter.writeRecords(this.txObserverDispatch.resultsArray)       // returns a promise
             .then(() => {
-                console.log('this.txObserverDispatch.resultArray written to fild.csv');
+                console.log('this.txObserverDispatch.resultsArray written to fild.csv');
             });
 
 
